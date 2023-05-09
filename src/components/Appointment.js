@@ -62,8 +62,6 @@ const Appointment = () => {
     let endDate = picker.selectedMonth.add(1, 'months').set('date', 1)
     endDate = endDate.subtract(1, 'days').set('hour', 23).set('minute', 59).set('second', 59).toDate()
     const result = await getAvailableSpots(startDate, endDate)
-    setTimezone(result.availability_timezone)
-    setOffset(findTzByKey(result.availability_timezone).offset)
     const extract = result.days.map(e => {
       const spots = e.spots.filter(itm => itm.status === 'available')
       const obj = { date: e.date, spots }
@@ -103,7 +101,7 @@ const Appointment = () => {
         if (isSelected) className += ' text-white bg-indigo-300 rounded-full cursor-pointer'
         else if (isAvailable) className += ' bg-indigo-100 text-blue-600 rounded-full cursor-pointer'
       }
-      if (!isAvailable) className += ' text-gray-600 cursor-pointer'
+      if (!isAvailable && !isToday) className += ' text-gray-600 cursor-pointer'
       renderElement.push(
         <div key={'display-date' + i} className='relative'>
           <div className={className} onClick={(e) => { dateClicked(_temp.format('yyyy-MM-DD')) }}>
@@ -155,23 +153,38 @@ const Appointment = () => {
 
   const scheduleEvent = async () => {
     setLoading(true)
-    let startTime = moment(picker.day + ' ' + picker.time)
-    let endTime = moment(startTime).add({ minute: 30 })
-    const customerResult = await createCustomer({})
-    if (Object.keys(customerResult).length > 0) {
-      const scheduleResult = await createSchedule({ 'customer_id': customerResult.customer_id, 'start_time': startTime.toDate(), 'end_time': endTime.toDate(), 'address': address })
-      if (Object.keys(scheduleResult).length > 0) {
-        let _dates = [...bookedDates]
-        _dates.push({ 'date': startTime.format('yyyy-MM-DD'), 'time': startTime.format('h:mm a') })
-        setBookedDates(_dates)
-        setMettingPane(false)
-        setPicker({...picker, time: ''})
-        setName('')
-        setPhone('')
-        setAddress('')
+
+    try {
+      let startTime = moment(picker.day + ' ' + picker.time)
+      let endTime = moment(startTime).add({ minute: 30 })
+      const customerResult = await createCustomer({
+        'customer_contact_name': name.split(' ')[0],
+        'customer_contact_last_name': name.split(' ')[1],
+        'customer_contact_phone': phone
+      })
+      if (Object.keys(customerResult).length > 0) {
+        const scheduleResult = await createSchedule({
+          'customer_id': customerResult.customer_id,
+          'start_time': startTime.toDate(),
+          'end_time': endTime.toDate(),
+          'address': address
+        })
+        if (Object.keys(scheduleResult).length > 0) {
+          let _dates = [...bookedDates]
+          _dates.push({ 'date': startTime.format('yyyy-MM-DD'), 'time': startTime.format('h:mm a') })
+          setBookedDates(_dates)
+          setMettingPane(false)
+          setPicker({ ...picker, time: '' })
+          setName('')
+          setPhone('')
+          setAddress('')
+        }
+        setLoading(false)
       }
+    } catch (e) {
+      console.log('scheduleEventCatch=>', e)
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   if (!meetingPane) {
