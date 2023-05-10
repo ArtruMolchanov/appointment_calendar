@@ -162,6 +162,7 @@ const Appointment = () => {
         'customer_contact_last_name': name.split(' ')[1],
         'customer_contact_phone': phone
       })
+      console.log('customerResult', customerResult)
       if (Object.keys(customerResult).length > 0) {
         const scheduleResult = await createSchedule({
           'customer_id': customerResult.customer_id,
@@ -233,7 +234,7 @@ const Appointment = () => {
           <div>
             <div className='text-2xl'>{moment(picker.day).format('dddd, MMMM DD')}</div>
             <div className='rounded-full text-center bg-blue-600 px-4 py-1 text-white mt-3'>Show times you are free</div>
-            <div className='mt-3'>
+            <div className='mt-3 overflow-y-auto px-1' style={{maxHeight: '460px'}}>
               {
                 currentDateSpots.length > 0 ? currentDateSpots.map((e, idx) => {
                   let cTime = moment(e.start_time).format('h:mm a')
