@@ -191,6 +191,7 @@ const Appointment = () => {
   if (!meetingPane) {
     return (
       <>
+        <div id='fluentc-widget'></div>
         <div className='block md:flex p-4' style={{ minWidth: '448px' }}>
           <div className='relative'>
             <MyLoader loading={loading}></MyLoader>
