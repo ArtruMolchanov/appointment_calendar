@@ -7,7 +7,7 @@
 
 # Tutorial 1
 
-Create a simple, multi-page website that watches your CSS changes & refreshes your app, accordingly.
+Create a simple, multi-page website that watches your CSS changes & refreshes your app, accordingly
 
 To view the Medium.com article: [Creating A Simple Website with React, Tailwind CSS, & PostCSS](https://medium.com/clocktwine/creating-a-simple-website-using-react-tailwind-css-postcss-6bbc419ded0c)
 
